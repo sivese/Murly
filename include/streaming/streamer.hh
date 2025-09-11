@@ -21,24 +21,44 @@
 #include "rtc_base/thread.h"
 #include "rtc_base/ref_counted_object.h"
 
+// Forward declarations
+class PCObserver;
+
 class WebRTCStreamer {
 public:
-    WebRTCStreamer();
-    ~WebRTCStreamer();
-
+    // Core functionality
     bool initialize();
+    bool createPeerConnection();
     
     bool startStreaming(int camera_index);
     void stopStreaming();
 
-    bool createPeerConnection();
-    void handleOffer();
-    void handleAnswer();
-    void handleIceCandidate(const std::string& candidate, const std::string& sdp_mid, int sdp_mline_index);
+    // SDP handling
+    void createOffer();
+    void createAnswer();
+    void setRemoteDescription(const std::string& sdp, const std::string& type);
+    void setLocalDescription(const std::string& sdp, const std::string& type);
 
+    // ICE candidate handling
+    void addIceCandidate(const std::string& candidate, const std::string& sdp_mid, int sdp_mline_index);
+
+    // Callback functions for signaling
     std::function<void(const std::string& sdp)> onOfferCreated;
     std::function<void(const std::string& sdp)> onAnsweredCreated;
     std::function<void(const std::string& candidate, const std::string& sdp_mid, int sdp_mline_index)> onIceCandidateFound;
 private:
+    // WebRTC core components
+    webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory_;
+    webrtc::scoped_refptr<webrtc::PeerConnectionInterface> peer_connection_;
+    
+    // Threading
+    std::unique_ptr<webrtc::Thread> signaling_thread_;
+    std::unique_ptr<webrtc::Thread> worker_thread_;
+    std::unique_ptr<webrtc::Thread> network_thread_;
 
+    // Video components
+    webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_source_;
+    
+    // Observer
+    std::unique_ptr<PCObserver> pc_observer_;
 };
