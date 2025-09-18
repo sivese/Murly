@@ -16,6 +16,7 @@ namespace chat {
         );
 
         void write(const Message& msg);
+        void write();
         void close();
 
     private:
