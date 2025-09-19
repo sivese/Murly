@@ -19,7 +19,7 @@ namespace chat {
     public:
         Message();
 
-        const char* data() const    {   return _data; }
+        const char* data() const    { return _data; }
         char* data()                { return _data; }
 
         std::size_t length() const  { return HEADER_LENGTH + _bodyLength; }

@@ -44,7 +44,10 @@ void Client::connect(const TcpResolver::results_type& endpoints) {
 void Client::readHeader() {
     boost::asio::async_read(
         _socket,
-        boost::asio::buffer(_readMsg.data(), Message::HEADER_LENGTH),
+        boost::asio::buffer(
+            _readMsg.data(), 
+            Message::HEADER_LENGTH
+        ),
         [this](std::error_code ec, std::size_t /*length*/) {
             if (!ec && _readMsg.decodeHeader()) {
                 readBody();
@@ -56,9 +59,42 @@ void Client::readHeader() {
 }
 
 void Client::readBody() {
+    boost::asio::async_read(
+        _socket,
+        boost::asio::buffer(
+            _readMsg.body(), 
+            _readMsg.bodyLength()
+        ),
+        [this](std::error_code ec, std::size_t /*length*/) {
+            if (!ec) {
+                std::cout.write(_readMsg.body(), _readMsg.bodyLength());
+                std::cout<<"\n";
 
+                readHeader();
+            } 
+            else {
+                _socket.close();
+            }
+        }
+    );
 }
 
 void Client::write() {
-    
+    boost::asio::async_write(
+        _socket,
+        boost::asio::buffer(
+            _writeMsgs.front().data(),
+            _writeMsgs.front().length()
+        ),
+        [this](std::error_code ec, std::size_t /*length*/) {
+            if (!ec) {
+                _writeMsgs.pop_front();
+
+                if(!_writeMsgs.empty()) write();
+            }
+            else {
+                _socket.close();
+            }
+        }
+    );
 }
