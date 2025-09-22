@@ -5,7 +5,7 @@ using namespace chat;
 Message::Message() : _bodyLength(0) { }
 
 void Message::bodyLength(std::size_t newLength) {
-    _bodyLength = _bodyLength > MAX_BODY_LENGTH ? MAX_BODY_LENGTH : newLength;
+    _bodyLength = newLength > MAX_BODY_LENGTH ? MAX_BODY_LENGTH : newLength;
 }
 
 bool Message::decodeHeader() {

@@ -39,7 +39,7 @@ void Session::readHeader() {
                 readBody();
             } 
             else {
-                std::cout<<" Disconnect from client."<<std::endl;
+                std::cout<<" Disconnect from client. An error occurred on reading header: "<<ec.message()<<std::endl;
                 _room.leave(shared_from_this());
             }
         }
@@ -58,7 +58,7 @@ void Session::readBody() {
                 readHeader();
             } 
             else {
-                std::cout<<" Disconnect from client."<<std::endl;
+                std::cout<<" Disconnect from client. An error occurred on reading body: "<<ec.message()<<std::endl;
                 _room.leave(shared_from_this());
             }
         }
@@ -83,7 +83,7 @@ void Session::write() {
                 }
             }
             else {
-                std::cout<<" Disconnect from client."<<std::endl;
+                std::cout<<" Disconnect from client. An error occurred on writing : "<<ec.message()<<std::endl;
                 _room.leave(shared_from_this());
             }
         }

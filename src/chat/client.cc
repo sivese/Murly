@@ -19,7 +19,7 @@ void Client::write(const Message& msg) {
             _writeMsgs.push_back(msg);
 
             if (!writeInProgress) {
-                doWrite();
+                write();
             }
         }
     );
@@ -28,15 +28,26 @@ void Client::write(const Message& msg) {
 void Client::close() {
     boost::asio::post(
         _ioContext,
-        [this]() { _socket.close(); }
+        [this]() { 
+            if(_socket.is_open()) {
+                std::cout << "Closing connection..." << std::endl;
+                _socket.close(); 
+            }
+        }
     );
 }
 
 void Client::connect(const TcpResolver::results_type& endpoints) {
     boost::asio::async_connect(
         _socket, endpoints,
-        [this](std::error_code ec, TcpEndpoint) {
-            if(!ec) readHeader();
+        [this](std::error_code ec, TcpEndpoint ep) {
+            if(!ec) {
+                std::cout<< "Connected to server at " << ep << std::endl;
+                readHeader();
+            }
+            else {
+                std::cerr<< "Connection failed, error: " << ec.message() << std::endl;
+            }
         }
     );
 }
@@ -51,7 +62,9 @@ void Client::readHeader() {
         [this](std::error_code ec, std::size_t /*length*/) {
             if (!ec && _readMsg.decodeHeader()) {
                 readBody();
-            } else {
+            } 
+            else {
+                std::cerr<< "Failed to read header: " << ec.message() << std::endl;
                 _socket.close();
             }
         }
@@ -67,12 +80,14 @@ void Client::readBody() {
         ),
         [this](std::error_code ec, std::size_t /*length*/) {
             if (!ec) {
+                std::cout<<">> ";
                 std::cout.write(_readMsg.body(), _readMsg.bodyLength());
                 std::cout<<"\n";
 
                 readHeader();
             } 
             else {
+                std::cerr<< "Failed to read body: " << ec.message() << std::endl;
                 _socket.close();
             }
         }
