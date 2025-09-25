@@ -18,7 +18,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
 endif()
 
 # Find required packages
-find_package(Boost REQUIRED COMPONENTS thread filesystem system)
+if(WIN32)
+# For Windows, please install Boost libraries manually.
+# Then set BOOST_ROOT and BOOST_LIBRARYDIR environment variables if Boost is not found
+    find_package(Boost REQUIRED COMPONENTS thread filesystem)
+else()
+    find_package(Boost REQUIRED COMPONENTS thread filesystem system)
+endif()
 find_package(Threads REQUIRED)
 
 # Define source files explicitly (better than globbing)
@@ -28,6 +34,11 @@ set(CHAT_SOURCES
     src/chat/session.cc
     src/chat/server.cc
     src/chat/client.cc
+
+    src/web/request.cc
+    src/web/response.cc
+    src/web/utils.cc
+    
     src/app/chat.cc
 )
 

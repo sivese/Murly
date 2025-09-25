@@ -15,7 +15,6 @@ namespace web::http {
         PATCH,
         TRACE,
         CONNECT,
-        TRACE,
         UNKNOWN
     };
 
@@ -51,7 +50,7 @@ namespace web::http {
         std::size_t                 contentLength() const;
 
         std::optional<std::string>                   getQueryParam(const std::string& name) const;
-        std::unordered_map<std::string, std::string> queryParams() const;
+        std::unordered_map<std::string, std::string> getQueryParams() const;
 
         std::string methodToString() const;
         std::string versionToString() const;
@@ -72,7 +71,9 @@ namespace web::http {
 
         Method      stringToMethod(const std::string& method) const;
         Version     stringToVersion(const std::string& version) const;
+        
         std::string toLowerCase(const std::string& str) const;
+        std::string toUpperCase(const std::string& str) const;
 
         void parseRequestLine(const std::string& line);
         void parseHeaderLine(const std::string& line);
