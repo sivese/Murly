@@ -7,8 +7,8 @@
 #include <algorithm>
 
 namespace web::http::utils {
-    std::string urlEncode(const std::string& str);
-    std::string urlDecode(const std::string& str);
+    std::string urlEncode(const std::string& url);
+    std::string urlDecode(const std::string& url);
     
     // MIME type detection
     std::string getMimeType(const std::string& filename);
