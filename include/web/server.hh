@@ -35,6 +35,55 @@ namespace web::http {
         HttpServer& put(const std::string& path, RouteHandler handler);
         HttpServer& del(const std::string& path, RouteHandler handler);
         HttpServer& route(const std::string& method, const std::string& path, RouteHandler handler);
+
+        // middleware support
+        HttpServer& use(Middleware middleware);
+
+        // static file serving
+        HttpServer& serverStatic(const std::string& urlPath, const std::string& filePath);
+        
+        void start();
+        void stop();
+
+        const HttpServerConfig& config() const { return _config; }
     private:
+        void accept();
+        HttpResponse handleRequest(const HttpRequest& request);
+
+        struct Route {
+            Method method;
+            std::string path;
+            RouteHandler handler;
+        };
+
+        IOContext& _ioc;
+        TcpAcceptor _acceptor;
+        HttpServerConfig _config;
+    
+        std::vector<Route> _routes;
+        std::vector<Middleware> _middlewares;
+        std::unordered_map<std::string, std::string> _staticDirectories;
+
+        bool _isRunning = false;
+        friend class HttpConnection;
+    };
+
+    class HttpConnection : public std::enable_shared_from_this<HttpConnection> {
+    public:
+        HttpConnection(TcpSocket socket, HttpServer& server);
+        ~HttpConnection() = default;
+
+        void start();
+    private:
+        void read();
+        void processRequest();
+        void write();
+
+        TcpSocket _socket;
+        HttpServer& _server;
+        boost::asio::streambuf _buffer;
+
+        HttpRequest _request;
+        std::string _responseData;
     };
 }
