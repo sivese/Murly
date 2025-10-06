@@ -34,13 +34,13 @@ namespace web::http {
         HttpServer& post(const std::string& path, RouteHandler handler);
         HttpServer& put(const std::string& path, RouteHandler handler);
         HttpServer& del(const std::string& path, RouteHandler handler);
-        HttpServer& route(const std::string& method, const std::string& path, RouteHandler handler);
+        HttpServer& route(Method method, const std::string& path, RouteHandler handler);
 
         // middleware support
         HttpServer& use(Middleware middleware);
 
         // static file serving
-        HttpServer& serverStatic(const std::string& urlPath, const std::string& filePath);
+        HttpServer& serveStatic(const std::string& urlPath, const std::string& filePath);
         
         void start();
         void stop();

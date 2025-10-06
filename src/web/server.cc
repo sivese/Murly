@@ -57,3 +57,40 @@ void HttpServer::accept() {
         }
     );
 }
+
+HttpServer& HttpServer::get(const std::string& path, RouteHandler handler) {
+    return route(Method::GET, path, handler);
+}
+
+HttpServer& HttpServer::post(const std::string& path, RouteHandler handler) {
+    return route(Method::POST, path, handler);
+}
+
+HttpServer& HttpServer::put(const std::string& path, RouteHandler handler) {
+    return route(Method::PUT, path, handler);
+}
+
+HttpServer& HttpServer::del(const std::string& path, RouteHandler handler) {
+    return route(Method::DELETE, path, handler);
+}
+
+HttpServer& HttpServer::route(Method method, const std::string& path, RouteHandler handler) {
+    _routes.push_back({method, path, handler});
+    std::cout<<"Registered route: "<< static_cast<int>(method) <<" "<<path<<std::endl;
+    return *this;
+}
+
+HttpServer& HttpServer::use(Middleware middleware) {
+    _middlewares.push_back(middleware);
+    return *this;
+}
+
+HttpServer& HttpServer::serveStatic(const std::string& path, const std::string& directory) {
+    _staticDirectories[path] = directory;
+    std::cout<<"Serving static files: "<<path<<" -> "<<directory<<std::endl;
+    return *this;
+}
+
+HttpResponse HttpServer::handleRequest(const HttpRequest& request) {
+    
+}
