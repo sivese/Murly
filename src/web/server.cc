@@ -92,5 +92,26 @@ HttpServer& HttpServer::serveStatic(const std::string& path, const std::string& 
 }
 
 HttpResponse HttpServer::handleRequest(const HttpRequest& request) {
-    
+    // Log the request
+    std::cout << request.methodToString() << " " << request.path() << std::endl;
+
+    // Check for matching route
+    for(const auto& route : _routes) {
+        if (route.method == request.method() && route.path == request.path()) {
+            try {
+                return route.handler(request);
+            }
+            catch(const std::exception& e) {
+                std::cerr<<"Handler error: "<<e.what()<<std::endl;
+                return HttpResponse::internalError("Internal Server Error");
+            }
+        }
+    }
+
+    // Check for static file serving
+    for (const auto& [mountPath, directory] : _staticDirectories) {
+        if(request.path().find(mountPath) == 0) {
+
+        }
+    }
 }
