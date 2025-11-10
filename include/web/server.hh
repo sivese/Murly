@@ -77,7 +77,7 @@ namespace web::http {
     private:
         void read();
         void processRequest();
-        void write();
+        void write(const HttpResponse& response);
 
         TcpSocket _socket;
         HttpServer& _server;
